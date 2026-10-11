@@ -1,177 +1,122 @@
-# 🏰 Dungeon Forge
+# Dungeon Forge · Babylon.js
 
-### ▶ [Play the live demo](https://procedural-dungeon.netlify.app)  ·  by [@majidmanzarpour](https://x.com/majidmanzarpour)
+An independent, **unofficial Babylon.js port** of [Dungeon Forge](https://github.com/majidmanzarpour/threejs-procedural-dungeon) by Majid Manzarpour. This fork preserves the original deterministic room/graph/grid generator while replacing the Three.js renderer with Babylon.js and separating the core from the demo UI.
 
-**A deterministic procedural dungeon generator you can watch build itself, room by room.** Rooms
-are scattered and shoved apart, triangulated, wired into a corridor graph, carved into a tile grid,
-and dressed with theme-specific props, liquids, lights, and particles — **every stage seeded from a
-single number, so any seed rebuilds the exact same dungeon.** Rendered live with
-[Three.js](https://threejs.org/).
+This is a standalone browser application. It does not require a game platform, backend, account, API key, paid service, downloaded models, or external fonts. It is not an official Babylon.js project, and it does not claim pixel-identical rendering to the original Three.js demo.
 
-![Dungeon Forge — a procedurally generated molten dungeon seen from above](docs/preview.jpg)
+## Run locally
 
-> Type a seed, pick a theme, drag the sliders, and watch the pipeline light up stage by stage.
-> Every forge is reproducible and every dungeon is guaranteed fully connected.
+Use Node.js **22.12+** (or a newer supported LTS release) and npm.
 
----
+```sh
+npm ci
+npm run dev
+```
 
-## ✨ Features
+Open the URL printed by Vite (normally `http://localhost:5173`). For a production build and local preview:
 
-- **One seed, one dungeon.** A single `mulberry32` stream is threaded through *every* stage —
-  scatter, separation, triangulation, room roles, carving, decoration. The same seed always yields
-  the same map, down to the last torch. Change one digit and get an entirely new floor.
-- **A real generation pipeline, visualized.** Watch it run: **scatter → separate → Delaunay →
-  MST + loops → semantics → carve → rasterize + BFS → decorate.** Each step lights up in the HUD as
-  it happens, and you can scrub the whole build animation or skip it.
-- **Graph-based layouts.** Rooms are Delaunay-triangulated, reduced to a **minimum spanning tree**
-  for guaranteed connectivity, then selectively re-looped so the dungeon has shortcuts and cycles
-  instead of a boring spanning-tree spider.
-- **Room semantics.** A BFS from the entrance assigns depth and difficulty, then tags rooms as
-  **entrance, combat, elite, treasure, shrine, or boss** based on where they sit on the critical
-  path — so the layout reads like a real level, not just connected boxes.
-- **Five hand-tuned themes** (plus **AUTO**, which picks one from the seed): **Ancient, Molten,
-  Frost, Grim, Verdant.** Each swaps the palette, lighting rig, liquids (lava / water / miasma),
-  props, particle system (embers / snow / spores / wisps), and torch color.
-- **Procedural everything.** Stone, cracks, runes, portals, and light shafts are all generated to
-  canvas textures at load; geometry is built from primitives; nothing is loaded from disk.
-- **Instanced rendering.** Thousands of floor tiles, walls, props, and decorations are drawn with
-  `InstancedMesh`, so an 80-room dungeon with ~6,000 floor tiles still holds a high frame rate.
-- **Custom post-processing.** A hand-written pipeline — bright-pass **bloom**, separable blur,
-  **tilt-shift** focus band, cool-shadow / warm-highlight color grade, vignette, and film grain —
-  gives the whole thing its painted-miniature look. Toggle it live for an A/B.
-- **Live readouts.** Room count, links · loops, critical-path length, floor-tile count, light count,
-  generation time, draw calls, triangles, and FPS — all updating as you forge.
-- **Overlays.** Flip on the **graph overlay** to see the Delaunay edges, MST, and loops in world
-  space, or the **difficulty heatmap** to see how the danger ramps from entrance to boss.
-- **Object layers.** Toggle whole categories of the scene on and off live — **props, torches,
-  particles, liquids, lights** — without re-forging. Strip it back to bare architecture, or kill the
-  lights and watch it read by torchlight alone.
-- **Responsive & touch-ready.** The control panel collapses to a slim bar (on desktop *and* mobile)
-  so the dungeon has the whole screen, and every target is sized for a fingertip on phones/tablets.
+```sh
+npm run build
+npm run preview
+```
 
----
+Serve the generated `dist/` directory with a static HTTP server; do not open `index.html` using `file://`. No server-side application is needed.
 
-## 🎮 Controls
+```sh
+npm run check
+npm test
+```
+
+The check script runs TypeScript without emitting output. Tests exercise the engine-independent generator, including deterministic results and floor-grid reachability. They are not a guarantee of collision-safe gameplay or a GPU performance benchmark.
+
+See [PORTING.md](PORTING.md) for the public APIs, source boundaries, renderer decisions, and verification checklist.
+
+## Features and controls
+
+- Seeded layouts with 12–80 rooms, adjustable loops, and decoration density.
+- Ancient, Molten, Frost, Grim, and Verdant themes; Auto chooses a theme from the seed.
+- Entrance, combat, elite, treasure, shrine, and boss room roles.
+- Babylon.js architecture and decorations, themed liquids, particles, lights, and post-processing.
+- Graph and difficulty overlays, object visibility toggles, and live rendering statistics.
+- Optional animated build reveal, reduced-motion support, and a collapsible responsive panel.
 
 | Action | Input |
 | --- | --- |
-| Pan | drag |
-| Zoom | scroll wheel |
-| Orbit | shift-drag |
-| Reforge | `R` or **FORGE DUNGEON** |
+| Pan | Drag |
+| Zoom | Mouse wheel |
+| Orbit | Shift-drag / right-drag |
+| New random seed | `R` / dice button |
+| Rebuild current seed | **FORGE DUNGEON** |
 | Cycle theme | `T` |
-| Toggle graph overlay | `G` |
+| Toggle connection graph | `G` |
 | Toggle difficulty heatmap | `H` |
-| Toggle post FX | `P` |
-| Skip build animation | `space` |
+| Toggle post-processing | `P` |
+| Finish build reveal | `Space` |
 
-The panel (top-left) drives everything: type a **seed** (or roll the dice), pick a **theme**, and
-adjust **rooms**, **loopiness**, and **decor density**. Every change re-forges deterministically.
+Shortcuts do not intercept typing or interaction with form controls. Slider changes are debounced and rebuild without the reveal animation. Layer/overlay toggles do not regenerate the dungeon.
 
----
+## Generation and rendering
 
-## 🚀 Quick start
+1. Scatter differently sized rectangular, elliptical, and octagonal rooms.
+2. Push overlapping room bounds apart.
+3. Delaunay-triangulate room centers to obtain candidate connections.
+4. Build a minimum spanning tree, then add selected loop edges.
+5. Assign room roles and graph-based depth/difficulty.
+6. Rasterize rooms and straight/L-shaped corridors into a dynamically sized tile grid.
+7. Check floor reachability, then add theme-specific decoration and spawn markers.
+8. Render the completed data in Babylon.js.
 
-```bash
-npm install
-npm run dev        # http://localhost:5173
-```
+The same **seed and settings** reproduce the same generated data, apart from measured generation time. Changing the theme can also affect generation choices; it is not solely a material swap.
 
-Build a static bundle (drop `dist/` on any static host — Netlify, GitHub Pages, itch.io, a plain
-folder):
+The extracted core retains upstream's successful layout outputs and random-call order. Fifteen golden fixtures compare complete results against the pinned upstream version. Boundary validation, parameter snapshots, and clear errors after five failed connectivity attempts are the intentional API hardening changes; the generation algorithm was not replaced.
 
-```bash
-npm run build
-npm run preview    # serve the production build locally
-```
+The Babylon.js renderer uses thin-instance batches, locally generated textures, custom liquid shaders, and themed particles. Its current lighting budget is **up to six accent point lights plus one directional sunlight and one hemispheric fill light**, with percentage-closer filtered (PCF) directional shadows. The **LIGHTS** toggle/readout refers only to accent lights; sunlight and fill remain active. Bloom, FXAA, ACES tone mapping, and vignette are Babylon-native effects, not a translation of every original post-processing pass.
 
-Requires Node 18+.
-
----
-
-## 🧠 How it works
-
-Every forge runs the same deterministic pipeline. Nothing is random in the "different each run"
-sense — the only entropy is the seed you give it.
-
-1. **Scatter.** Room rectangles are sampled in a rough disc, sized from a distribution biased toward
-   small rooms with a few large ones.
-2. **Separate.** Overlapping rooms push each other apart over a few relaxation passes until the
-   layout is non-overlapping but still compact.
-3. **Delaunay.** Room centers are Delaunay-triangulated to get a natural, non-crossing candidate
-   graph of "which rooms could plausibly connect."
-4. **MST + loops.** A minimum spanning tree over that graph guarantees the dungeon is **fully
-   connected**; then a tunable fraction of the leftover Delaunay edges are added back as **loops**
-   for shortcuts and cycles.
-5. **Semantics.** A breadth-first search from the entrance assigns each room a depth and difficulty,
-   finds the critical path to the boss, and tags rooms as entrance / combat / elite / treasure /
-   shrine / boss.
-6. **Carve.** Rooms and their connecting corridors are stamped into a tile grid (floor / wall /
-   doorway), with L-shaped corridors and the occasional sunken liquid pit.
-7. **Rasterize + BFS.** The grid is walked to place walls, doorways, and edge trims, and to compute
-   per-tile shading (ambient occlusion from neighboring walls, moss, pool glow).
-8. **Decorate.** Props, torches, runes, portals, and a theme-appropriate particle field are
-   scattered by density; point lights are budgeted and placed at the most important rooms and
-   torches.
-9. **Render.** Everything is batched into `InstancedMesh` draw calls and composited through the
-   custom post-processing stack.
+**The layout is computed synchronously before the build reveal.** The animated stages visualize already-computed data; they are not incremental generation or progress reporting for background computation. Generation time in the panel measures the core, not GPU frame time or the entire scene rebuild.
 
 ### Project structure
 
+```text
+src/
+  core/
+    generator.js        # Upstream-derived engine-independent implementation
+    generator.d.ts      # Typed public exports
+    types.ts            # Dungeon data and generation settings
+  babylon/
+    DungeonView.ts      # Engine, scene, thin instances, input, reveal, and lifecycle
+    placements.ts       # Deterministic data-to-instance planning
+    kit.ts              # Babylon geometry and procedural canvas textures
+    effects.ts          # Liquid shaders, particles, portals, and runes
+    registrations.ts    # Required Babylon texture-binding registrations
+    cameraInput.ts      # Projection-tested grab-pan math
+  main.ts               # Demo UI/bootstrap and lifecycle cleanup
+  ui/styles.css         # Responsive controls and telemetry
+tests/                  # Golden fixtures, core invariants, placement and geometry tests
+public/
+  THIRD_PARTY_NOTICES.txt # Copied into the production build for redistribution
+index.html              # Standalone canvas and accessible control panel
+PORTING.md              # Public APIs, implementation choices, and verification notes
 ```
-dungeon-forge/
-├── index.html          # canvas mount + control/telemetry panel markup
-├── src/
-│   ├── main.js         # the whole app: RNG, generator pipeline, themes,
-│   │                   #   procedural textures/geometry, instanced render,
-│   │                   #   post-processing, camera, input, HUD
-│   └── ui/
-│       └── styles.css  # panel, HUD, legend, and control styling
-├── docs/preview.jpg    # README hero
-└── public/og.jpg       # social-share image
-```
 
-The generator and renderer live in a single self-contained `main.js` — it's one tightly-coupled
-system (shared RNG, materials, geometry caches, and render targets), so it reads best as one module.
+### Deliberate boundaries
 
----
+- This is a **single-floor 2D layout rendered in 3D**, not a multi-storey dungeon generator.
+- There is no player controller, physics, navigation mesh, combat, or enemy AI. Spawn markers are visual data.
+- Floor connectivity is checked **before** decorative obstacles are considered. It is not a claim that a capsule-shaped player can traverse every decorated passage.
+- Blind corridor carving can introduce crossings/shortcuts not represented in the planned room graph. Graph difficulty is not a precise physical travel distance.
+- No export, project persistence, game-platform integration, or external generation service is included.
+- Renderer effects are native Babylon.js interpretations of the original presentation, not a pixel-for-pixel shader translation.
 
-## 🎛️ The panel
+## Upstream and attribution
 
-| Control | What it does |
-| --- | --- |
-| **Seed** | the number every stage is derived from; the dice button rolls a random one |
-| **Theme** | `AUTO` (seed-picked) or force **Ancient / Molten / Frost / Grim / Verdant** |
-| **Objects** | toggle **props / torches / particles / liquids / lights** on or off, live |
-| **Rooms** | how many rooms to scatter (12–80) |
-| **Loopiness** | fraction of Delaunay edges added back as loops beyond the MST |
-| **Decor density** | how heavily rooms are dressed with props and particles |
-| **Graph overlay** | draw the Delaunay edges, MST, and loops over the world |
-| **Difficulty heatmap** | tint rooms by their BFS difficulty, entrance → boss |
-| **Animate build** | play the pipeline stage-by-stage (or forge instantly) |
-| **Post FX** | toggle the bloom / tilt-shift / grade / grain stack |
+- Original project: [majidmanzarpour/threejs-procedural-dungeon](https://github.com/majidmanzarpour/threejs-procedural-dungeon)
+- Port baseline: [`0a2aa0980028cbbc77af6642b4232b45713dc5de`](https://github.com/majidmanzarpour/threejs-procedural-dungeon/tree/0a2aa0980028cbbc77af6642b4232b45713dc5de)
+- Babylon fork: [exena/dungeon-forge-babylon](https://github.com/exena/dungeon-forge-babylon)
 
-The panel collapses with the button in its top-right corner — on desktop and mobile alike — to hand
-the canvas back to the dungeon.
+The original preview images, if present in the fork history, show the **upstream Three.js renderer**, not this Babylon.js port. They are intentionally not presented here as screenshots of the port.
 
----
+## License
 
-## 🛠️ Built with
+The original Dungeon Forge code and this port are distributed under [MIT](LICENSE). Original copyright: © 2026 Majid Manzarpour. Preserve the original copyright and MIT license notice when redistributing substantial portions of the code.
 
-- [Three.js](https://threejs.org/) — WebGL rendering
-- [Vite](https://vitejs.dev/) — dev server & bundler
-
-No game engine, no physics library, no asset pipeline — the geometry, textures, and post-processing
-are all generated in the browser.
-
-> **A note on the Three.js version.** This started life as a single-file prototype pinned to
-> Three.js **r128** (loaded from a CDN). It has since been migrated to the latest Three.js as an ES
-> module: the color-management API (`outputColorSpace` / color-space constants), MSAA render targets
-> (the `samples` option), and the physically-based lighting model (analytic light intensities scaled
-> to match the old legacy look) were all updated so the render matches the original pixel-for-pixel.
-
----
-
-## 📄 License
-
-[MIT](LICENSE) © 2026 [Majid Manzarpour](https://x.com/majidmanzarpour).
+The browser distribution includes [THIRD_PARTY_NOTICES.txt](public/THIRD_PARTY_NOTICES.txt): the original MIT text, Babylon.js's package NOTICE, and its Apache-2.0 license. Keep that file with distributed `dist/` contents. Development/build tools retain their own licenses in their installed packages; this notice file addresses the upstream application and runtime rendering dependency, not a complete license inventory of npm's development toolchain.

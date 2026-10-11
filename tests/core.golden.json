@@ -1,0 +1,158 @@
+{
+  "source": "https://github.com/majidmanzarpour/threejs-procedural-dungeon",
+  "commit": "0a2aa0980028cbbc77af6642b4232b45713dc5de",
+  "method": "SHA-256 of upstream generateDungeon output JSON, omitting genMs and converting typed arrays to arrays. Captured from isolated upstream core before port comparison.",
+  "cases": [
+    {
+      "params": {
+        "seed": 1337,
+        "roomCount": 42,
+        "themeKey": "ancient",
+        "loopChance": 0.15,
+        "decorDensity": 0.6
+      },
+      "sha256": "3a91e4bfda5c652cc011872bdc94a5470db07ad15c43e84fae500054ceec7388"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "roomCount": 12,
+        "themeKey": "ancient",
+        "loopChance": 0,
+        "decorDensity": 0
+      },
+      "sha256": "130f1a03ab1cf28a9ffeb3b503d75e3b1079b1bd2085a1f7932f055b1a7d26cb"
+    },
+    {
+      "params": {
+        "seed": 4294967295,
+        "roomCount": 80,
+        "themeKey": "ancient",
+        "loopChance": 0.4,
+        "decorDensity": 1
+      },
+      "sha256": "0a2f7a729174226da9261d1de967a1dd9f33740b585c1981b20d6a9ff710c3f4"
+    },
+    {
+      "params": {
+        "seed": 1337,
+        "roomCount": 42,
+        "themeKey": "molten",
+        "loopChance": 0.15,
+        "decorDensity": 0.6
+      },
+      "sha256": "7180348c61a1b1b063a7399ca45c23577a83c6317417b6c9b18e3c6a86796948"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "roomCount": 12,
+        "themeKey": "molten",
+        "loopChance": 0,
+        "decorDensity": 0
+      },
+      "sha256": "6acfee5b07bdf0d20eea1e88941ff3e378ef696347bd3099f2d3fe68a4ce1c73"
+    },
+    {
+      "params": {
+        "seed": 4294967295,
+        "roomCount": 80,
+        "themeKey": "molten",
+        "loopChance": 0.4,
+        "decorDensity": 1
+      },
+      "sha256": "b00f41b412a57ed01952e69b73e0d582885f4b4a4769ebff193b02ff79f31775"
+    },
+    {
+      "params": {
+        "seed": 1337,
+        "roomCount": 42,
+        "themeKey": "frost",
+        "loopChance": 0.15,
+        "decorDensity": 0.6
+      },
+      "sha256": "fa787e6e22bd9a6a0102606ab799ad0456a3b9bd51e81afa9e51be92c2e896b9"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "roomCount": 12,
+        "themeKey": "frost",
+        "loopChance": 0,
+        "decorDensity": 0
+      },
+      "sha256": "697b65905dcdfc56297a019416b9d176ba56aeaa8f8854cb2c832fe61ecb99af"
+    },
+    {
+      "params": {
+        "seed": 4294967295,
+        "roomCount": 80,
+        "themeKey": "frost",
+        "loopChance": 0.4,
+        "decorDensity": 1
+      },
+      "sha256": "0b775d353fd0c3d258b3e0d5ca79fd49dba6000e5185fc1de8c470ae0bfbfdfe"
+    },
+    {
+      "params": {
+        "seed": 1337,
+        "roomCount": 42,
+        "themeKey": "grim",
+        "loopChance": 0.15,
+        "decorDensity": 0.6
+      },
+      "sha256": "4e8e7b3a337b7d3faf569d4c819b81be533f4a7076b25f8714a782d1e1bdc6d5"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "roomCount": 12,
+        "themeKey": "grim",
+        "loopChance": 0,
+        "decorDensity": 0
+      },
+      "sha256": "49b549096538c6651b485674b6c4d09353e99d7a2f7e4a9497f00a998669e831"
+    },
+    {
+      "params": {
+        "seed": 4294967295,
+        "roomCount": 80,
+        "themeKey": "grim",
+        "loopChance": 0.4,
+        "decorDensity": 1
+      },
+      "sha256": "8529b19ba98f838e08142710085d0c1e7eff4f3760ad118435f1f1816ca10620"
+    },
+    {
+      "params": {
+        "seed": 1337,
+        "roomCount": 42,
+        "themeKey": "verdant",
+        "loopChance": 0.15,
+        "decorDensity": 0.6
+      },
+      "sha256": "8abd22abda66226968e5889c6f59825a506c3a7551165c3efbbf873250b502bb"
+    },
+    {
+      "params": {
+        "seed": 0,
+        "roomCount": 12,
+        "themeKey": "verdant",
+        "loopChance": 0,
+        "decorDensity": 0
+      },
+      "sha256": "f3b4b86ebad0836cbe599443b8602940a94a8b5f8afc1a2fdfac76be680f5625"
+    },
+    {
+      "params": {
+        "seed": 4294967295,
+        "roomCount": 80,
+        "themeKey": "verdant",
+        "loopChance": 0.4,
+        "decorDensity": 1
+      },
+      "sha256": "73984c3848b21139d868fb4e0e3d16a298bf1691d0017ae8e08c644bc0cf61a3"
+    }
+  ]
+}
+

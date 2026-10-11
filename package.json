@@ -1,13 +1,15 @@
 {
-  "name": "dungeon-forge",
+  "name": "dungeon-forge-babylon",
   "version": "1.0.0",
-  "description": "A deterministic procedural dungeon generator you can watch build itself, room by room — scatter, separate, Delaunay-triangulate, MST + loops, carve, and theme, rendered live with Three.js.",
+  "private": true,
+  "description": "An independent Babylon.js port of Dungeon Forge by Majid Manzarpour",
   "type": "module",
   "author": "Majid Manzarpour (https://x.com/majidmanzarpour)",
-  "homepage": "https://procedural-dungeon.netlify.app",
+  "repository": { "type": "git", "url": "https://github.com/exena/dungeon-forge-babylon.git" },
+  "engines": { "node": ">=22.12.0" },
   "license": "MIT",
   "keywords": [
-    "three.js",
+    "babylon.js",
     "procedural-generation",
     "procgen",
     "dungeon-generator",
@@ -17,14 +19,19 @@
     "gamedev"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run check && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.*"
   },
   "dependencies": {
-    "three": "^0.185.0"
+    "@babylonjs/core": "9.12.1"
   },
   "devDependencies": {
-    "vite": "^8.0.0"
+    "@types/node": "^22.0.0",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vite": "8.0.0"
   }
 }
